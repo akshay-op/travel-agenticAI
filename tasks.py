@@ -1,32 +1,42 @@
 from crewai import Task
-from agents import trip_planner, transport_agent, stay_agent, weather_agent, budget_agent
+from agents import *
 
-trip_planner_task = Task(
-    description="Plan a complete day-wise itinerary using info from other agents.",
-    agent=trip_planner,
-    expected_output="List format: Day-wise plan with place, activity, stay, transport, and key weather note.",
-)
+from crewai import Task
 
-transport_task = Task(
-    description="Find 3 good transport options from {start_location} to {destination} between {start_date} and {end_date}.",
-    agent=transport_agent,
-    expected_output="Short list: Mode, price (₹), time, and provider (max 3 entries).No explanation.",
-)
+def create_itinerary_task(agent, destination, num_days):
+    return Task(
+        description=f"""Create a {num_days}-day itinerary for {destination}.
+        Include:
+        - Daily activities and attractions
+        - Recommended areas to stay
+        - Brief description of each day
+        
+        Keep it concise and practical.""",
+        agent=agent,
+        expected_output=f"Day-by-day itinerary for {num_days} days in {destination} with key locations and activities"
+    )
 
-stay_task = Task(
-    description="Find 3 stays in {destination} for dates {start_date} to {end_date} within ₹{budget}.",
-    agent=stay_agent,
-    expected_output="Name, price/night (₹), area, and rating. Max 3 entries.No explanation.",
-)
+def create_flight_task(agent, tools, origin, destination, departure_date, return_date):
+    return Task(
+        description=f"""Search for flights from {origin} to {destination}.
+        Departure: {departure_date}
+        Return: {return_date}
+        Use IATA code of the airports near to {origin} and {destination} as input for the API for flight search.
+        Find best options and provide summary.""",
+        agent=agent,
+        tools=tools,
+        expected_output=f"Flight options from {origin} to {destination} with prices and times"
+    )
 
-weather_task = Task(
-    description="Get temperature, rain chance, and clothing advice for {destination} during the trip.",
-    agent=weather_agent,
-    expected_output="Temp range (°C), rain chance (%), and clothing tip.No explanation.",
-)
-
-budget_task = Task(
-    description="Summarize total trip cost from transport and stay info. Suggest 1 cost-saving tip if needed.",
-    agent=budget_agent,
-    expected_output="Total cost (₹), per person (₹), and 1 cost-saving tip.No explanation.",
-)
+def create_hotel_task(agent, tools, itinerary_context, checkin_date, checkout_date):
+    return Task(
+        description=f"""Based on the itinerary, search for hotels.
+        Check-in: {checkin_date}
+        Check-out: {checkout_date}
+        
+        Use itinerary locations to find suitable accommodation.
+        Context: {itinerary_context}""",
+        agent=agent,
+        tools=tools,
+        expected_output="Hotel recommendations with prices and locations matching the itinerary"
+    )

@@ -1,50 +1,35 @@
 from crewai import Agent
-from llm_config import llm 
+from llm_config import llmL33_70BV,llm3_70B8,llm31_8BI,llm4s17b16ei
 
-# 1. Trip Planner Agent (the master agent)
-trip_planner = Agent(
-    role="Trip Planner",
-    goal="Plan a personalized trip using other agents.",
-    backstory="You create travel itineraries by coordinating with agents for transport, stay, weather, and budget.",
-    allow_delegation=True,
-    verbose=False,
-    llm=llm
-)
+def create_itinerary_agent():
+    return Agent(
+        role="Travel Itinerary Planner",
+        goal="Create day-by-day travel itinerary based on destination and duration",
+        backstory="Expert travel planner who creates efficient itineraries with key attractions and activities",
+        llm=llm4s17b16ei,
+        verbose=True,
+        max_iter=4,
+        memory=False
+    )
 
-# 2. Transport Agent
-transport_agent = Agent(
-    role="Transport Agent",
-    goal="Suggest top transport options within the user’s budget and timeframe.",
-    backstory="You specialize in finding flights, trains, and buses for travelers.",
-    verbose=False,
-    llm=llm
-)
+def create_flight_agent():
+    return Agent(
+        role="Flight Booking Specialist",
+        goal="Find and recommend best flight options for travel dates",
+        backstory="Airline booking expert who finds optimal flights based on dates and budget",
+        llm=llmL33_70BV,
+        verbose=True,
+        max_iter=4,
+        memory=False
+    )
 
-# 3. Stay Agent
-stay_agent = Agent(
-    role="Stay Agent",
-    goal="Suggest hotels or stays within budget and close to key locations.",
-    backstory="You find stays via hotel APIs and travel platforms.",
-    verbose=False,
-    llm=llm
-)
-
-
-# 4. Weather Agent
-weather_agent = Agent(
-    role="Weather Agent",
-    goal="Give weather forecast and clothing advice.",
-    backstory="You use forecast data to advise on weather and packing.",
-    verbose=False,
-    llm=llm
-)
-
-# 5. Budget Agent
-budget_agent = Agent(
-    role="Budget Agent",
-    goal="Estimate total trip cost and suggest savings if needed.",
-    backstory="You review transport and stay data to give cost breakdown.",
-    verbose=False,
-    llm=llm
-)
-
+def create_hotel_agent():
+    return Agent(
+        role="Hotel Booking Specialist", 
+        goal="Find suitable accommodation based on itinerary locations",
+        backstory="Hotel booking expert who matches accommodation to travel plans and budget",
+        llm=llmL33_70BV,
+        verbose=True,
+        max_iter=4,
+        memory=False
+    )
